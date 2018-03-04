@@ -110,7 +110,7 @@ class UDPSocketHandler(asyncore.dispatcher_with_send):
     Start server with certain mode at certain ip:port with 
     success rate for simulating dropped packets.
 '''
-def main(mode, ipport, success):
+def main(mode, ipport, success, timeout):
     socket_handler = None
     ipport = ipport.strip().split(':')
 
@@ -132,7 +132,7 @@ def main(mode, ipport, success):
 
     try:
         server_socket = AsyncServerSocket(*args, socket_handler)
-        asyncore.loop(timeout=0) # timeout = 0 means poll, immediately react to callback data
+        asyncore.loop(timeout=timeout / 4) # timeout = 0 means poll with 0 timeout, immediately react to callback data at cost of 100% cpu usage.
 
     except Exception as e:
         print(e)
@@ -151,7 +151,19 @@ if __name__ == '__main__':
            raise argparse.ArgumentTypeError(str(err))
 
         if value < 0.0 or value > 1:
-            message = "Expected 0.0 <= value <= 1.0, got value = {}".format(value)
+            message = "Expected 0.0 <= success <= 1.0, got value = {}".format(value)
+            raise argparse.ArgumentTypeError(message)
+
+        return value
+
+    def check_timeout_choices(arg): # filter function for success process argument
+        try:
+            value = float(arg)
+        except ValueError as err:
+           raise argparse.ArgumentTypeError(str(err))
+
+        if value < 0.0:
+            message = "Expected 0.0 >= timeout, got value = {}".format(value)
             raise argparse.ArgumentTypeError(message)
 
         return value
@@ -164,5 +176,9 @@ if __name__ == '__main__':
                         dest='ipport', required=False, default="localhost:50000")
     parser.add_argument('--success', metavar= 'FloatRange[0,1]',help='success modifier, 1.0: 100%% success, 0.0: 0%% success. TCP does not support < 1 success modifier', type=check_success_choices,
                         dest='success', required=False, default=1.)
+    parser.add_argument('--timeout', metavar= 'FloatRange[0,+inf]',help='client timeout, this will be used to set the asyncore polling loop timeout. defaults to 0. Note: with 0 timeout' + 
+                        'the asyncore loop will consume a lot of CPU due to infinite loop.\n' +
+                        'if timeout is set, server will poll with a timeout 2x faster than the client. ', type=check_timeout_choices,
+                        dest='timeout', required=False, default=0.)
 
     main(**vars(parser.parse_args(sys.argv[1::])))

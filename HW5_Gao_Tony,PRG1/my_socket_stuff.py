@@ -62,6 +62,9 @@ class AsyncServerSocket(asyncore.dispatcher):
             self.bind(sa) # datagram sockets do not need to listen    
             print("AsyncServerSocket:UDP socket bound to {}".format(sa))
 
+        else:
+            raise socket.error('Could not initialize socket. type not supported by AsyncServerSocket: {!s}'.format(type))
+
     def handle_accepted(self, sock, addr):
         print('AsyncServerSocket:Incoming connection from %s' % repr(addr))
         handler = self.handler_class(sock)
@@ -83,6 +86,8 @@ class AsyncClientSocket(asyncore.dispatcher):
                 self.connect( sa )
             elif type == socket.SOCK_DGRAM:
                 pass
+            else:
+                raise socket.error('Could not initialize socket. type not supported by AsyncClientSocket: {!s}'.format(type))
 
             self.buffer = b''
             self.lock = threading.RLock()
@@ -126,14 +131,15 @@ class AsyncClientSocket(asyncore.dispatcher):
                 else:
                     print("AsyncClientSocket: No response recieved from {} in {} seconds, dumping write and read buffer".format(
                             self.sa, timeout))
-                    self.readbuffer = b''
+                    self.flush_buffers()
                     timeout *= 2
-                    print("AsyncClientSocket: Retrying with timeout {}".format(timeout))
+                    if timeout <= 2:
+                        print("AsyncClientSocket: Retrying with timeout {}".format(timeout))
             
             raise TimeoutError("AsyncClientSocket: Exponential backoff failed, request timed out")
 
     '''
-        Unused, flush read and write buffers.
+        Flush read and write buffers.
     '''
     def flush_buffers(self):
         self.flush_write_buffer()
@@ -142,7 +148,7 @@ class AsyncClientSocket(asyncore.dispatcher):
     def flush_write_buffer(self):
         self.buffer = b''
 
-    def purge_read_buffer(self):
+    def flush_read_buffer(self):
         self.readbuffer = b''
 
     '''
@@ -182,6 +188,8 @@ class AsyncClientSocket(asyncore.dispatcher):
             self.readbuffer, address = self.recvfrom(2048)
             print('handle_read(): readbuffer: {} from: {}'.format(self.readbuffer, address))
             self.cond.notify() 
+        except:
+            print('handle_read() encountered an error. Terminating from read.')
         finally:
             self.cond.release()
 

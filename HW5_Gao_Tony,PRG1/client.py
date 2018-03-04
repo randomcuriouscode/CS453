@@ -26,7 +26,7 @@ def asyncore_worker(timeout):
 '''
     Initialize the TCP client
 '''
-def init_tcp_client(ipport):
+def init_tcp_client(ipport, timeout):
     global client
 
     args = socket.getaddrinfo(ipport[0], int(ipport[1]), 
@@ -34,14 +34,14 @@ def init_tcp_client(ipport):
         proto=socket.IPPROTO_TCP)
     client = AsyncClientSocket(*args)
 
-    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': 1}, #timeout is asyncore polling interval
+    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': timeout / 2}, #timeout is asyncore polling interval
                                      daemon=True)
     client_thread.start()
 
 '''
     Initialize the UDP client
 '''
-def init_udp_client(ipport):
+def init_udp_client(ipport, timeout):
     global client
 
     args = socket.getaddrinfo(ipport[0], int(ipport[1]), 
@@ -49,7 +49,7 @@ def init_udp_client(ipport):
         proto=socket.IPPROTO_UDP)
     client = AsyncClientSocket(*args)
 
-    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': 0}, #timeout is asyncore polling interval
+    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': timeout / 2}, #timeout is asyncore polling interval
                                      daemon=True) # start as daemon so thread is killed when client dies
     client_thread.start()
 
@@ -64,9 +64,9 @@ def main(mode, ipport, timeout, exponential_backoff):
         ipport = ipport.split(':')
 
         if mode == 'TCP':
-            init_tcp_client(ipport)
+            init_tcp_client(ipport, timeout)
         else:
-            init_udp_client(ipport)
+            init_udp_client(ipport, timeout)
 
         to_send = input('Input opcode[+,-,*,/],a,b; q to quit:')
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                         dest='mode', required=True)
     parser.add_argument('--host', help='target Hostname:Port or IP:Port', 
                         dest='ipport', required=False, default="localhost:50000")
-    parser.add_argument('--timeout', help='Timeout in seconds', type=float,
+    parser.add_argument('--timeout', help='Timeout in seconds. The asyncore callback loop will poll at a rate (timeout / 2) seconds.', type=float,
                         dest='timeout', required=False, default=5)
     parser.add_argument('--expb', help='Exponential backoff setting. Set timeout to the appropriate value < 2', action='store_true',
                         dest='exponential_backoff', required=False, default=False)

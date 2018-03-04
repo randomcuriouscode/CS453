@@ -11,12 +11,25 @@ General Documentation:
 
 - help can be accessed using the '-h' flag on each executable
 - both TCP and UDP support exponential backoff.
-	- if exp backoff is used, timeout must be less than 2
+	- if exp backoff is used, timeout must be less than 2. 
+	  the timeout parameter is used as the STARTING value for 
+	  exponential backoff following timeout *= 2 per failed 
+	  request
 - the underlying sockets are closed automatically on process
   termination
 - see writeup.pdf for the full documentation of the design and
   implementation
 - client-server-uml.xml can be opened in draw.io
+
+it is highly reccommended to set the server.py --timeout parameter to 
+	the minimum client timeout. this is to avoid an infinite asyncore polling loop
+	with 0 block time, and thus indefinite CPU time used. this parameter has nothing
+	to do with the TCP/UDP request timeout behavior, however a server polling timeout
+	that is too long may cause requests to be overwritten in the read buffer, 
+	because there is one global read buffer on the server side. This parameter 
+	controls the time interval that dictates when the server will 
+	poll the underlying socket for bytes and thus the time interval that will
+	elapse between each read/write of the read buffer.
 
 TCP Documentation:
 
@@ -25,7 +38,7 @@ TCP Documentation:
   been implemented in this version.
 
 1. Run server with the following (configurable) parameters
-	python server.py --mode TCP --host localhost:50000
+	python server.py --mode TCP --host localhost:50000 --timeout .1
 2. Run client with the following (configurable) parameters
 	python client.py --mode TCP --timeout 15 --host localhost:50000
 
@@ -37,7 +50,7 @@ UDP Documentation:
   incoming UDP packets
 
 1. Run server with the following (configurable) parameters
-	python server.py --mode UDP --host localhost:50000 --success 1
+	python server.py --mode UDP --host localhost:50000 --success 1 --timeout .1
 2. Run client with the following (configurable) parameters
 	python client.py --mode UDP --timeout .1 --expb
 
@@ -46,4 +59,4 @@ UDP Documentation:
 	a response from the server.
 
 	if --expb is set, timeout must be less than 2 as previouly
-	stated
+	stated.
