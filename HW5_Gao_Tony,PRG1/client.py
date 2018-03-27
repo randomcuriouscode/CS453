@@ -34,7 +34,7 @@ def init_tcp_client(ipport, timeout):
         proto=socket.IPPROTO_TCP)
     client = AsyncClientSocket(*args)
 
-    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': timeout / 2}, #timeout is asyncore polling interval
+    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': .0025}, #timeout is asyncore polling interval
                                      daemon=True)
     client_thread.start()
 
@@ -49,7 +49,7 @@ def init_udp_client(ipport, timeout):
         proto=socket.IPPROTO_UDP)
     client = AsyncClientSocket(*args)
 
-    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': timeout / 2}, #timeout is asyncore polling interval
+    client_thread = threading.Thread(target=asyncore_worker, kwargs={'timeout': .0025}, #timeout is asyncore polling interval
                                      daemon=True) # start as daemon so thread is killed when client dies
     client_thread.start()
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                         dest='mode', required=True)
     parser.add_argument('--host', help='target Hostname:Port or IP:Port', 
                         dest='ipport', required=False, default="localhost:50000")
-    parser.add_argument('--timeout', help='Timeout in seconds. The asyncore callback loop will poll at a rate (timeout / 2) seconds.', type=float,
+    parser.add_argument('--timeout', help='Request timeout in seconds. The asyncore callback loop will poll at a rate of .0025 seconds.', type=float,
                         dest='timeout', required=False, default=5)
     parser.add_argument('--expb', help='Exponential backoff setting. Set timeout to the appropriate value < 2', action='store_true',
                         dest='exponential_backoff', required=False, default=False)

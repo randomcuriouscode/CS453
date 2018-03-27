@@ -176,7 +176,7 @@ if __name__ == '__main__':
                         dest='ipport', required=False, default="localhost:50000")
     parser.add_argument('--success', metavar= 'FloatRange[0,1]',help='success modifier, 1.0: 100%% success, 0.0: 0%% success. TCP does not support < 1 success modifier', type=check_success_choices,
                         dest='success', required=False, default=1.)
-    parser.add_argument('--timeout', metavar= 'FloatRange[0,+inf]',help='client timeout, this will be used to set the asyncore polling loop timeout. defaults to 0. Note: with 0 timeout' + 
+    parser.add_argument('--timeout', metavar= 'FloatRange[0,+inf]',help='client EVENT LOOP (not request) timeout, this will be used to set the asyncore polling loop timeout. defaults to 0. Note: with 0 timeout' + 
                         'the asyncore loop will consume a lot of CPU due to infinite loop.\n' +
                         'if timeout is set, server will poll with a timeout 2x faster than the client. ', type=check_timeout_choices,
                         dest='timeout', required=False, default=0.)
