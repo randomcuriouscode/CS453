@@ -1,0 +1,68 @@
+\documentclass[letter,10pt]{article}
+\usepackage[letterpaper, lmargin=.5in, rmargin=.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage[]{amsmath}
+\usepackage{mathtools}
+\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{subfig}
+% \usepackage{pstool}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usepackage[binary-units]{siunitx}
+\usepackage[backref=page,
+            pageanchor=true,
+            plainpages=false,
+            pdfpagelabels,
+            bookmarks,
+            bookmarksnumbered,
+            linkbordercolor={1 0.5 0.5},
+            citebordercolor={0 0.5 0},
+]{hyperref}
+
+\usepackage{array,mathtools}
+\newcommand*{\carry}[1][1]{\overset{#1}}
+\newcolumntype{B}[1]{r*{#1}{@{\,}r}}
+
+\newcommand{\eg}{\textit{e.g.},~}
+\newcommand{\etc}{\textit{etc.}}
+\let\eqref\undefined
+
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand{\algoref}[1]{Algorithm~\ref{algo:#1}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}
+\newcommand{\tabref}[1]{Table~\ref{tab:#1}}
+\newcommand{\eqref}[1]{Equation~\ref{eq:#1}}
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\algolabel}[1]{\label{algo:#1}}
+\newcommand{\seclabel}[1]{\label{sec:#1}}
+\newcommand{\tablabel}[1]{\label{tab:#1}}
+\newcommand{\eqlabel}[1]{\label{eq:#1}}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+
+% Title Page
+\title{CMPSCI 453\\HW8, Wireshark Lab 4}
+\author{Tony Gao}
+
+\begin{document}
+\maketitle
+
+%\begin{abstract}
+%\end{abstract}
+
+\section{Lab}
+
+
+
+\end{document}
